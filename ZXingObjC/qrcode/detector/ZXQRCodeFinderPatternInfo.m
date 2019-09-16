@@ -21,9 +21,16 @@
 
 - (id)initWithPatternCenters:(NSArray *)patternCenters {
   if (self = [super init]) {
-    _bottomLeft = patternCenters[0];
-    _topLeft = patternCenters[1];
-    _topRight = patternCenters[2];
+    _patternCenters = patternCenters;
+    if (patternCenters.count > 0) {
+      _bottomLeft = patternCenters[0];
+    }
+    if (patternCenters.count > 1) {
+      _topLeft = patternCenters[1];
+    }
+    if (patternCenters.count > 2) {
+      _topRight = patternCenters[2];
+    }
   }
 
   return self;

@@ -49,15 +49,18 @@
 }
 
 - (ZXDetectorResult *)detectWithError:(NSError **)error {
-  return [self detect:nil error:error];
+  return [self detect:nil error:error infoCallBack:nil];
 }
 
-- (ZXDetectorResult *)detect:(ZXDecodeHints *)hints error:(NSError **)error {
+- (ZXDetectorResult *)detect:(ZXDecodeHints *)hints error:(NSError **)error infoCallBack:(void (^)(ZXQRCodeFinderPatternInfo *))infoCallBack {
   self.resultPointCallback = hints == nil ? nil : hints.resultPointCallback;
 
   ZXQRCodeFinderPatternFinder *finder = [[ZXQRCodeFinderPatternFinder alloc] initWithImage:self.image resultPointCallback:self.resultPointCallback];
   ZXQRCodeFinderPatternInfo *info = [finder find:hints error:error];
-  if (!info) {
+  if (infoCallBack) {
+    infoCallBack(info);
+  }
+  if (info.patternCenters.count < 3) {
     return nil;
   }
 

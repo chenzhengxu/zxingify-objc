@@ -18,4 +18,6 @@
 
 @property (nonatomic, strong) UIWindow *window;
 
+- (void)setScale:(NSString *)scale;
+
 @end

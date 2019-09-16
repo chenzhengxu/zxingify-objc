@@ -45,7 +45,7 @@
  *   - QR Code cannot be found
  *   - a QR Code cannot be decoded
  */
-- (ZXDetectorResult *)detect:(ZXDecodeHints *)hints error:(NSError **)error;
+- (ZXDetectorResult *)detect:(ZXDecodeHints *)hints error:(NSError **)error infoCallBack:(void(^)(ZXQRCodeFinderPatternInfo *info))infoCallBack;
 
 - (ZXDetectorResult *)processFinderPatternInfo:(ZXQRCodeFinderPatternInfo *)info error:(NSError **)error;
 

@@ -139,11 +139,9 @@ NSInteger furthestFromAverageCompare(id center1, id center2, void *context);
   }
 
   NSMutableArray *patternInfo = [self selectBestPatterns];
-  if (!patternInfo) {
-    if (error) *error = ZXNotFoundErrorInstance();
-    return nil;
+  if (patternInfo.count >= 3) {
+    [ZXResultPoint orderBestPatterns:patternInfo];
   }
-  [ZXResultPoint orderBestPatterns:patternInfo];
   return [[ZXQRCodeFinderPatternInfo alloc] initWithPatternCenters:patternInfo];
 }
 
@@ -535,11 +533,8 @@ NSInteger furthestFromAverageCompare(id center1, id center2, void *context) {
  */
 - (NSMutableArray *)selectBestPatterns {
   int startSize = (int)[self.possibleCenters count];
-  if (startSize < 3) {
-    return nil;
-  }
 
-  if (startSize > 3) {
+  if (startSize > 0) {
     float totalModuleSize = 0.0f;
     float square = 0.0f;
     for (int i = 0; i < startSize; i++) {
@@ -576,7 +571,7 @@ NSInteger furthestFromAverageCompare(id center1, id center2, void *context) {
     self.possibleCenters = [[NSMutableArray alloc] initWithArray:[self.possibleCenters subarrayWithRange:NSMakeRange(0, 3)]];
   }
 
-  return [@[self.possibleCenters[0], self.possibleCenters[1], self.possibleCenters[2]] mutableCopy];
+  return [self.possibleCenters mutableCopy];
 }
 
 @end

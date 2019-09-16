@@ -27,12 +27,26 @@
 #import "ZXQRCodeDetector.h"
 #import "ZXQRCodeReader.h"
 #import "ZXResult.h"
+#import <UIKit/UIKit.h>
+#import "ZXQRCodeFinderPatternInfo.h"
+#import "ZXQRCodeFinderPattern.h"
+
+@interface ZXQRCodeReader ()
+
+@property (assign, nonatomic) NSInteger missCount;
+
+@end
 
 @implementation ZXQRCodeReader
+
++ (id)reader {
+    return [[ZXQRCodeReader alloc] init];
+}
 
 - (id)init {
   if (self = [super init]) {
     _decoder = [[ZXQRCodeDecoder alloc] init];
+    _missCount = 0;
   }
 
   return self;
@@ -69,12 +83,17 @@
     }
     points = [NSMutableArray array];
   } else {
-    ZXDetectorResult *detectorResult = [[[ZXQRCodeDetector alloc] initWithImage:matrix] detect:hints error:error];
+    __block ZXQRCodeFinderPatternInfo *patternInfo;
+    ZXDetectorResult *detectorResult = [[[ZXQRCodeDetector alloc] initWithImage:matrix] detect:hints error:error infoCallBack:^(ZXQRCodeFinderPatternInfo *info) {
+      patternInfo = info;
+    }];
     if (!detectorResult) {
+      [self handlePatternInfo:patternInfo];
       return nil;
     }
     decoderResult = [self.decoder decodeMatrix:[detectorResult bits] hints:hints error:error];
     if (!decoderResult) {
+      [self handlePatternInfo:patternInfo];
       return nil;
     }
     points = [[detectorResult points] mutableCopy];
@@ -104,6 +123,42 @@
                   value:@(decoderResult.structuredAppendParity)];
   }
   return result;
+}
+
+- (void)handlePatternInfo:(ZXQRCodeFinderPatternInfo *)patternInfo {
+    // iPhone 6 && iPhone X 一秒钟会回调3次
+    NSLog(@"patternCenters %@ missCount %ld", patternInfo.patternCenters, _missCount);
+    CGFloat target = 100.0;
+    if (patternInfo.patternCenters.count >= 3) {
+        CGFloat interval = 0.0;
+        if (patternInfo) {
+            CGFloat intervalX = fmaxf(fabsf(patternInfo.bottomLeft.x - patternInfo.topLeft.x), fabsf(patternInfo.topLeft.x - patternInfo.topRight.x));
+            CGFloat intervalY = fmaxf(fabsf(patternInfo.bottomLeft.y - patternInfo.topLeft.y), fabsf(patternInfo.topLeft.y - patternInfo.topRight.y));
+            interval = fmaxf(intervalX, intervalY);
+        }
+        _missCount = 0;
+        if (0 < interval && interval < target) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"ZXCaptureDeviceScaleNotification" object:@{@"multiply" : @(target / interval)}];
+        }
+    } else {
+      if (patternInfo.patternCenters.count >= 2 && _missCount > 2) {
+        CGFloat interval = 0.0;
+        ZXQRCodeFinderPattern *first = patternInfo.patternCenters[0];
+        ZXQRCodeFinderPattern *second = patternInfo.patternCenters[1];
+        CGFloat intervalX = fabsf(first.x - second.x);
+        CGFloat intervalY = fabsf(first.y - second.y);
+        interval = fmaxf(intervalX, intervalY);
+        // 过大的间距可能是错误的点
+        if (interval > 0 && interval < target) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"ZXCaptureDeviceScaleNotification" object:@{@"multiply" : @((target - 20) / interval)}];
+            _missCount = 0;
+        }
+      } else if (patternInfo.patternCenters.count >= 1 && _missCount > 5) {
+          [[NSNotificationCenter defaultCenter] postNotificationName:@"ZXCaptureDeviceScaleNotification" object:@{@"add" : @(0.3)}];
+          _missCount -= 3;
+      }
+      _missCount++;
+    }
 }
 
 - (void)reset {

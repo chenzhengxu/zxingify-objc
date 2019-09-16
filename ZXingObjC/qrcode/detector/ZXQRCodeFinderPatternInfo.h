@@ -25,6 +25,7 @@
 @property (nonatomic, strong, readonly) ZXQRCodeFinderPattern *bottomLeft;
 @property (nonatomic, strong, readonly) ZXQRCodeFinderPattern *topLeft;
 @property (nonatomic, strong, readonly) ZXQRCodeFinderPattern *topRight;
+@property (nonatomic, strong, readonly) NSArray *patternCenters;
 
 - (id)initWithPatternCenters:(NSArray *)patternCenters;
 

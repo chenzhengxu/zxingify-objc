@@ -23,6 +23,12 @@
 		25404718166AC1D200E13304 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 25404717166AC1D200E13304 /* Default-568h@2x.png */; };
 		25404737166AC2EA00E13304 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25404736166AC2EA00E13304 /* AVFoundation.framework */; };
 		25FFF6A61839839400C2E985 /* libZXingObjC-iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25FFF69B1839837F00C2E985 /* libZXingObjC-iOS.a */; };
+		36BFACB023273CF800516FEF /* ResultViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 36BFACAE23273CF800516FEF /* ResultViewController.m */; };
+		36BFACB123273CF800516FEF /* ResultViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 36BFACAF23273CF800516FEF /* ResultViewController.xib */; };
+		36C4BF562326486900FF0CD5 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 36C4BF542326486900FF0CD5 /* RootViewController.m */; };
+		36C4BF572326486900FF0CD5 /* RootViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 36C4BF552326486900FF0CD5 /* RootViewController.xib */; };
+		36C4BF5923264E6B00FF0CD5 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 36C4BF5823264E6B00FF0CD5 /* Images.xcassets */; };
+		36C4BF5B23264F0400FF0CD5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 36C4BF5A23264F0400FF0CD5 /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -99,6 +105,14 @@
 		25404717166AC1D200E13304 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = SOURCE_ROOT; };
 		25404736166AC2EA00E13304 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		25FFF6921839837E00C2E985 /* ZXingObjC.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ZXingObjC.xcodeproj; path = ../../ZXingObjC.xcodeproj; sourceTree = "<group>"; };
+		36BFACAD23273CF800516FEF /* ResultViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ResultViewController.h; sourceTree = SOURCE_ROOT; };
+		36BFACAE23273CF800516FEF /* ResultViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ResultViewController.m; sourceTree = SOURCE_ROOT; };
+		36BFACAF23273CF800516FEF /* ResultViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ResultViewController.xib; sourceTree = SOURCE_ROOT; };
+		36C4BF532326486900FF0CD5 /* RootViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = SOURCE_ROOT; };
+		36C4BF542326486900FF0CD5 /* RootViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = SOURCE_ROOT; };
+		36C4BF552326486900FF0CD5 /* RootViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RootViewController.xib; sourceTree = SOURCE_ROOT; };
+		36C4BF5823264E6B00FF0CD5 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		36C4BF5A23264F0400FF0CD5 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -161,10 +175,18 @@
 			children = (
 				02C6AFDB156FCB660052B145 /* AppDelegate.h */,
 				02C6AFDC156FCB660052B145 /* AppDelegate.m */,
+				36C4BF532326486900FF0CD5 /* RootViewController.h */,
+				36C4BF542326486900FF0CD5 /* RootViewController.m */,
+				36C4BF552326486900FF0CD5 /* RootViewController.xib */,
 				02C6AFD8156FCB4F0052B145 /* ViewController.h */,
 				02C6AFD9156FCB4F0052B145 /* ViewController.m */,
 				02C6AFDE156FCBA00052B145 /* ViewController.xib */,
+				36BFACAD23273CF800516FEF /* ResultViewController.h */,
+				36BFACAE23273CF800516FEF /* ResultViewController.m */,
+				36BFACAF23273CF800516FEF /* ResultViewController.xib */,
 				25404717166AC1D200E13304 /* Default-568h@2x.png */,
+				36C4BF5A23264F0400FF0CD5 /* LaunchScreen.storyboard */,
+				36C4BF5823264E6B00FF0CD5 /* Images.xcassets */,
 				024D10E6156EAB6F00FE6872 /* Supporting Files */,
 			);
 			path = BarcodeScanner;
@@ -223,12 +245,19 @@
 			attributes = {
 				LastUpgradeCheck = 1000;
 				ORGANIZATIONNAME = "Draconis Software";
+				TargetAttributes = {
+					024D10DA156EAB6F00FE6872 = {
+						DevelopmentTeam = 2RZ2KAJRS7;
+						ProvisioningStyle = Manual;
+					};
+				};
 			};
 			buildConfigurationList = 024D10D5156EAB6E00FE6872 /* Build configuration list for PBXProject "BarcodeScanner" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 024D10D0156EAB6E00FE6872;
@@ -297,8 +326,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36C4BF5B23264F0400FF0CD5 /* LaunchScreen.storyboard in Resources */,
 				02C6AFE0156FCBA00052B145 /* ViewController.xib in Resources */,
+				36BFACB123273CF800516FEF /* ResultViewController.xib in Resources */,
+				36C4BF5923264E6B00FF0CD5 /* Images.xcassets in Resources */,
 				02C6AFE3156FCBA80052B145 /* InfoPlist.strings in Resources */,
+				36C4BF572326486900FF0CD5 /* RootViewController.xib in Resources */,
 				25404718166AC1D200E13304 /* Default-568h@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -312,6 +345,8 @@
 			files = (
 				02C6AFD7156FCB330052B145 /* main.m in Sources */,
 				02C6AFDA156FCB4F0052B145 /* ViewController.m in Sources */,
+				36C4BF562326486900FF0CD5 /* RootViewController.m in Sources */,
+				36BFACB023273CF800516FEF /* ResultViewController.m in Sources */,
 				02C6AFDD156FCB660052B145 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -440,7 +475,10 @@
 		024D10FA156EAB6F00FE6872 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = 2RZ2KAJRS7;
 				ENABLE_BITCODE = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BarcodeScanner-Prefix.pch";
@@ -453,6 +491,7 @@
 				LIBRARY_SEARCH_PATHS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.zxing.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = WYB_Wildcard_Development;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -460,7 +499,10 @@
 		024D10FB156EAB6F00FE6872 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BarcodeScanner-Prefix.pch";
@@ -473,6 +515,7 @@
 				LIBRARY_SEARCH_PATHS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.zxing.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

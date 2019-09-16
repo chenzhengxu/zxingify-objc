@@ -19,7 +19,7 @@
 
 @protocol ZXCaptureDelegate <NSObject>
 
-- (void)captureResult:(ZXCapture *)capture result:(ZXResult *)result;
+- (void)captureResult:(ZXCapture *)capture result:(ZXResult *)result lastScannedImage:(UIImage *)lastScannedImage;
 
 @optional
 - (void)captureSize:(ZXCapture *)capture

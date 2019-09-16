@@ -16,6 +16,7 @@
 
 #import <AudioToolbox/AudioToolbox.h>
 #import "ViewController.h"
+#import "ResultViewController.h"
 
 @interface ViewController ()
 
@@ -24,6 +25,7 @@
 @property (nonatomic, weak) IBOutlet UILabel *decodedLabel;
 @property (nonatomic) BOOL scanning;
 @property (nonatomic) BOOL isFirstApplyOrientation;
+@property (strong, nonatomic) UIButton *backBtn;
 
 @end
 
@@ -35,6 +37,7 @@
 
 - (void)dealloc {
   [self.capture.layer removeFromSuperlayer];
+  [self.capture stop];
 }
 
 - (void)viewDidLoad {
@@ -52,16 +55,29 @@
   
   [self.view bringSubviewToFront:self.scanRectView];
   [self.view bringSubviewToFront:self.decodedLabel];
+    
+    self.scanRectView.layer.borderWidth = 1.0;
+    self.scanRectView.layer.borderColor = [UIColor redColor].CGColor;
   
   //  [self.capture setLuminance: TRUE];
   //  [self.capture.luminance setFrame: CGRectMake(150, 30, 100, 100)];
   //  [self.view.layer addSublayer: self.capture.luminance];
   
   //  [self.capture enableHeuristic];
+    self.backBtn = [[UIButton alloc] initWithFrame:CGRectMake(8, 80, 40, 40)];
+    self.backBtn.backgroundColor = [UIColor blackColor];
+    [self.backBtn setTitle:@"back" forState:UIControlStateNormal];
+    [self.view addSubview:self.backBtn];
+    [self.backBtn addTarget:self action:@selector(clickBackBtn:) forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)clickBackBtn:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-  [super viewWillAppear:animated];
+    [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:YES animated:YES];
 }
 
 - (void)viewDidLayoutSubviews {
@@ -146,8 +162,10 @@
     scaleVideoY = self.capture.layer.frame.size.height / videoSizeX;
   }
   
-  _captureSizeTransform = CGAffineTransformMakeScale(1.0/scaleVideoX, 1.0/scaleVideoY);
-  self.capture.scanRect = CGRectApplyAffineTransform(transformedVideoRect, _captureSizeTransform);
+  CGRect scanRect = CGRectMake((videoSizeY-transformedVideoRect.size.height/scaleVideoY)/2.0, (videoSizeX-transformedVideoRect.size.width/scaleVideoX)/2.0, transformedVideoRect.size.height/scaleVideoY, transformedVideoRect.size.width/scaleVideoX);
+  self.capture.scanRect = scanRect;
+//  _captureSizeTransform = CGAffineTransformMakeScale(1.0/scaleVideoX, 1.0/scaleVideoY);
+//  self.capture.scanRect = CGRectApplyAffineTransform(transformedVideoRect, _captureSizeTransform);
 }
 
 #pragma mark - Private Methods
@@ -213,7 +231,7 @@
   self.scanning = YES;
 }
 
-- (void)captureResult:(ZXCapture *)capture result:(ZXResult *)result {
+- (void)captureResult:(ZXCapture *)capture result:(ZXResult *)result lastScannedImage:(UIImage *)lastScannedImage {
   if (!self.scanning) return;
   if (!result) return;
   
@@ -238,14 +256,21 @@
   NSString *formatString = [self barcodeFormatToString:result.barcodeFormat];
   NSString *display = [NSString stringWithFormat:@"Scanned!\n\nFormat: %@\n\nContents:\n%@\nLocation: %@", formatString, result.text, location];
   [self.decodedLabel performSelectorOnMainThread:@selector(setText:) withObject:display waitUntilDone:YES];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        ResultViewController *vc = [[ResultViewController alloc] init];
+        vc.result = display;
+        vc.image = lastScannedImage;
+        [self.navigationController pushViewController:vc animated:YES];
+    });
+
   
   // Vibrate
   AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
   
-  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-    self.scanning = YES;
-    [self.capture start];
-  });
+//  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+//    self.scanning = YES;
+//    [self.capture start];
+//  });
 }
 
 @end

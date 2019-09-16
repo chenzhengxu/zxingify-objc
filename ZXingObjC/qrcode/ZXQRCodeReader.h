@@ -25,4 +25,6 @@
 
 @property (nonatomic, strong, readonly) ZXQRCodeDecoder *decoder;
 
++ (id)reader;
+
 @end

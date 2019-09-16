@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ResultViewController">
+            <connections>
+                <outlet property="imageView" destination="hAz-py-FnW" id="qeb-Qs-Sb0"/>
+                <outlet property="resultLabel" destination="IBD-Qx-p4V" id="k3F-9z-Wz1"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="hAz-py-FnW">
+                    <rect key="frame" x="57" y="298" width="300" height="300"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="300" id="1ks-v4-ShU"/>
+                        <constraint firstAttribute="width" constant="300" id="IBR-8G-jhD"/>
+                    </constraints>
+                </imageView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IBD-Qx-p4V">
+                    <rect key="frame" x="20" y="618" width="374" height="20.5"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ic0-Nm-DSj">
+                    <rect key="frame" x="165.5" y="218" width="83" height="30"/>
+                    <state key="normal" title="back to root"/>
+                    <connections>
+                        <action selector="clickbutton:" destination="-1" eventType="touchUpInside" id="x1y-Vd-M99"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="ic0-Nm-DSj" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="0mb-db-Ict"/>
+                <constraint firstItem="IBD-Qx-p4V" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="20" id="Fbj-jp-Wtf"/>
+                <constraint firstItem="hAz-py-FnW" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="Q3J-vT-qoe"/>
+                <constraint firstItem="hAz-py-FnW" firstAttribute="top" secondItem="ic0-Nm-DSj" secondAttribute="bottom" constant="50" id="RKm-Cj-5Ge"/>
+                <constraint firstItem="IBD-Qx-p4V" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="iZm-wu-HJr"/>
+                <constraint firstItem="hAz-py-FnW" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" id="pws-ZI-bsA"/>
+                <constraint firstItem="IBD-Qx-p4V" firstAttribute="top" secondItem="hAz-py-FnW" secondAttribute="bottom" constant="20" id="smC-7k-aQV"/>
+                <constraint firstAttribute="trailing" secondItem="IBD-Qx-p4V" secondAttribute="trailing" constant="20" id="tUr-Bv-d7E"/>
+            </constraints>
+        </view>
+    </objects>
+</document>

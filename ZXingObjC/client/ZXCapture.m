@@ -23,6 +23,7 @@
 #import "ZXHybridBinarizer.h"
 #import "ZXReader.h"
 #import "ZXResult.h"
+#import <UIKit/UIKit.h>
 
 @interface ZXCapture ()
 
@@ -43,6 +44,9 @@
 
 @property (nonatomic, assign) BOOL heuristic;
 @property (nonatomic, copy) dispatch_queue_t parallelQueue;
+@property (nonatomic, assign) CGFloat scale;
+@property (nonatomic, assign) BOOL isAnimating;
+@property (nonatomic, assign) CGRect originScanRect;
 @end
 
 @implementation ZXCapture
@@ -60,14 +64,16 @@
     _orderOutSkip = 0;
     _captureFramesPerSec = 3.0f;
     
-    if (NSClassFromString(@"ZXMultiFormatReader")) {
-      _reader = [NSClassFromString(@"ZXMultiFormatReader") performSelector:@selector(reader)];
+    if (NSClassFromString(@"ZXQRCodeReader")) {
+      _reader = [NSClassFromString(@"ZXQRCodeReader") performSelector:@selector(reader)];
     }
     
     _rotation = 0.0f;
     _running = NO;
     _transform = CGAffineTransformIdentity;
     _scanRect = CGRectZero;
+    _scale = 1.0;
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDeviceScale:) name:@"ZXCaptureDeviceScaleNotification" object:nil];
   }
   
   return self;
@@ -89,6 +95,55 @@
       [_session removeOutput:output];
     }
   }
+    
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:@"ZXCaptureDeviceScaleNotification" object:nil];
+}
+
+- (void)handleDeviceScale:(NSNotification *)noti {
+  if (_isAnimating) {
+    return;
+  }
+  if (![noti.object isKindOfClass:[NSDictionary class]]) {
+    return;
+  }
+  NSDictionary *dict = noti.object;
+  if ([dict[@"multiply"] floatValue] <= 1.0 && [dict[@"add"] floatValue] <= 0) {
+    return;
+  }
+  __weak typeof(self) weakself = self;
+  _isAnimating = YES;
+  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    weakself.isAnimating = NO;
+  });
+  if ([dict[@"multiply"] floatValue] > 1) {
+    _scale *= [dict[@"multiply"] floatValue];
+  }
+  if ([dict[@"add"] floatValue] > 0) {
+    _scale += [dict[@"add"] floatValue];
+  }
+  self.scale = fminf(_scale, 3.8);
+  CGFloat videoZoomFactorUpscaleThreshold = _captureDevice.activeFormat.videoZoomFactorUpscaleThreshold;
+  CGFloat targetZoomFactor = _scale > videoZoomFactorUpscaleThreshold ? videoZoomFactorUpscaleThreshold : _scale;
+  if (targetZoomFactor != _captureDevice.videoZoomFactor) {
+    if ([_captureDevice respondsToSelector:@selector(setVideoZoomFactor:)]) {
+      if ([_captureDevice lockForConfiguration:nil]) {
+        [_captureDevice rampToVideoZoomFactor:targetZoomFactor withRate:5];
+        [_captureDevice unlockForConfiguration];
+      }
+    }
+  }
+  CGFloat targetLayerScale = _scale > videoZoomFactorUpscaleThreshold ? _scale / videoZoomFactorUpscaleThreshold : 1.0;
+  CGRect targetRect = CGRectMake(_originScanRect.origin.x + _originScanRect.size.width*(1-1.0/targetLayerScale)*0.5, _originScanRect.origin.y + _originScanRect.size.height*(1-1.0/targetLayerScale)*0.5, _originScanRect.size.width/targetLayerScale, _originScanRect.size.height/targetLayerScale);
+  if (CGRectEqualToRect(targetRect, _scanRect)) {
+    return;
+  }
+  _scanRect = targetRect;
+  dispatch_async(dispatch_get_main_queue(), ^{
+      [CATransaction begin];
+      [CATransaction setAnimationDuration:0.2];
+      weakself.layer.affineTransform = CGAffineTransformMakeScale(targetLayerScale, targetLayerScale);
+      [CATransaction commit];
+  });
 }
 
 #pragma mark - Property Getters
@@ -199,6 +254,12 @@
   _parallelQueue = dispatch_queue_create("com.zxing.parallelQueue", DISPATCH_QUEUE_CONCURRENT);
 }
 
+- (void)setScanRect:(CGRect)scanRect {
+  _scanRect = scanRect;
+  if (!CGRectEqualToRect(CGRectZero, scanRect)) {
+    _originScanRect = scanRect;
+  }
+}
 
 #pragma mark - Back, Front, Torch
 
@@ -289,6 +350,11 @@
     [self.session startRunning];
   }
   self.running = YES;
+  if (_scale <= 1) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [self setInitalScale];
+    });
+  }
 }
 
 - (void)stop {
@@ -306,33 +372,33 @@
 #pragma mark - CAAction
 
 - (id<CAAction>)actionForLayer:(CALayer *)_layer forKey:(NSString *)event {
-  [CATransaction setValue:[NSNumber numberWithFloat:0.0f] forKey:kCATransactionAnimationDuration];
-  
-  if ([event isEqualToString:kCAOnOrderIn] || [event isEqualToString:kCAOnOrderOut]) {
-    return self;
-  }
+//  [CATransaction setValue:[NSNumber numberWithFloat:0.0f] forKey:kCATransactionAnimationDuration];
+//
+//  if ([event isEqualToString:kCAOnOrderIn] || [event isEqualToString:kCAOnOrderOut]) {
+//    return self;
+//  }
   
   return nil;
 }
 
 - (void)runActionForKey:(NSString *)key object:(id)anObject arguments:(NSDictionary *)dict {
-  if ([key isEqualToString:kCAOnOrderIn]) {
-    if (self.orderInSkip) {
-      self.orderInSkip--;
-      return;
-    }
-    
-    self.onScreen = YES;
-    [self startStop];
-  } else if ([key isEqualToString:kCAOnOrderOut]) {
-    if (self.orderOutSkip) {
-      self.orderOutSkip--;
-      return;
-    }
-    
-    self.onScreen = NO;
-    [self startStop];
-  }
+//  if ([key isEqualToString:kCAOnOrderIn]) {
+//    if (self.orderInSkip) {
+//      self.orderInSkip--;
+//      return;
+//    }
+//
+//    self.onScreen = YES;
+//    [self startStop];
+//  } else if ([key isEqualToString:kCAOnOrderOut]) {
+//    if (self.orderOutSkip) {
+//      self.orderOutSkip--;
+//      return;
+//    }
+//
+//    self.onScreen = NO;
+//    [self startStop];
+//  }
 }
 
 #pragma mark - AVCaptureVideoDataOutputSampleBufferDelegate
@@ -433,8 +499,9 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     NSError *error;
     ZXResult *result = [self.reader decode:bitmap hints:self.hints error:&error];
     if (result) {
+      UIImage* image = [UIImage imageWithCGImage:_lastScannedImage];
       dispatch_async(dispatch_get_main_queue(), ^{
-        [self.delegate captureResult:self result:result];
+        [self.delegate captureResult:self result:result lastScannedImage:image];
       });
     }
   }
@@ -446,6 +513,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
  */
 - (void)decodeImageAdv:(CGImageRef)cgImage {
   CGImageRef img = CGImageCreateCopy(cgImage);
+  UIImage* image = [UIImage imageWithCGImage:_lastScannedImage];
   dispatch_async(_parallelQueue, ^{
     ZXCGImageLuminanceSourceInfo *sourceInfo = [[ZXCGImageLuminanceSourceInfo alloc] initWithDecomposingMin];
     ZXCGImageLuminanceSource *source = [[ZXCGImageLuminanceSource alloc] initWithCGImage:img
@@ -456,9 +524,9 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     ZXBinaryBitmap *bitmap = [[ZXBinaryBitmap alloc] initWithBinarizer:binarizer];
     NSError *error;
     ZXResult *result = [self.reader decode:bitmap hints: self.hints error:&error];
-    if (result && [self.delegate respondsToSelector: @selector(captureResult:result:)]) {
+    if (result && [self.delegate respondsToSelector: @selector(captureResult:result:lastScannedImage:)]) {
       dispatch_async(dispatch_get_main_queue(), ^{
-        [self.delegate captureResult:self result:result];
+        [self.delegate captureResult:self result:result lastScannedImage:image];
       });
     }
   });
@@ -579,6 +647,28 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
   }
   
   [self.session commitConfiguration];
+}
+
+- (void)setInitalScale {
+  CGFloat initalScale = 1.4;
+  CGFloat videoZoomFactorUpscaleThreshold = _captureDevice.activeFormat.videoZoomFactorUpscaleThreshold;
+  if (videoZoomFactorUpscaleThreshold >= initalScale) {
+    if ([_captureDevice respondsToSelector:@selector(setVideoZoomFactor:)]) {
+      if ([_captureDevice lockForConfiguration:nil]) {
+        [_captureDevice setVideoZoomFactor:initalScale];
+        [_captureDevice unlockForConfiguration];
+        self.scale = initalScale;
+      }
+    }
+  }
+}
+
+- (void)setScale:(CGFloat)scale {
+    _scale = scale;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        id delegate = [UIApplication sharedApplication].delegate;
+        [delegate performSelector:NSSelectorFromString(@"setScale:") withObject:[NSString stringWithFormat:@"scale: %.2f", scale] afterDelay:0];
+    });
 }
 
 - (AVCaptureSession *)session {
